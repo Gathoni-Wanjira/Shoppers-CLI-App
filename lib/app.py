@@ -1,7 +1,35 @@
 import click
 from database.db import session
+from cli import find_product_by_name , add_product_to_cart , remove_product_from_cart , calculate_cart_total
 from sqlalchemy.orm.exc import NoResultFound
 from model.models import Customer, Product, Cart
+
+# Create a Click group and add the functions
+@click.group()
+def cli():
+    pass
+
+cli.add_command(find_product_by_name)
+cli.add_command(add_product_to_cart)
+cli.add_command(remove_product_from_cart)
+cli.add_command(calculate_cart_total)
+
+if __name__ == "__main__":
+    cli()
+
+
+# Find a product by its name
+@click.command()
+@click.option('--product_name', prompt='Enter product name', help='Find a product by its name.')
+def find_product_by_name(product_name):
+    """
+    Find a product by its name.
+    """
+    try:
+        product = session.query(Product).filter(Product.product_name == product_name).one()
+        click.echo(f"Found product: {product.product_name}, Price: ${product.price}")
+    except NoResultFound:
+        click.echo(f"Product {product_name} not found.")
 
 # Add a product to the cart for a specific customer
 @click.command()
@@ -52,15 +80,3 @@ def calculate_cart_total(customer_id):
 
     click.echo(f"Total price of products in the cart for customer {customer_id}: ${total_price}")
 
-# Create a Click group and add the functions
-@click.group()
-def cli():
-    pass
-
-cli.add_command(find_product_by_name)
-cli.add_command(add_product_to_cart)
-cli.add_command(remove_product_from_cart)
-cli.add_command(calculate_cart_total)
-
-if __name__ == "__main__":
-    cli()
