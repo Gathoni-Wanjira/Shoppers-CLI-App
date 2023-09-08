@@ -1,11 +1,11 @@
-from sqlalchemy.orm import session
+from database.db import session
 from sqlalchemy.orm.exc import NoResultFound
 from model.models import Customer, Product, Cart
 
 from sqlalchemy.orm.exc import NoResultFound
 
 # Find a product by its name
-def find_product_by_name(session, product_name):
+def find_product_by_name(product_name):
     try:
         product = session.query(Product).filter(Product.product_name == product_name).one()
         return product
@@ -13,13 +13,13 @@ def find_product_by_name(session, product_name):
         return None
 
 # Add a product to the cart for a specific customer
-def add_product_to_cart(session, customer_id, product_id):
+def add_product_to_cart(customer_id, product_id):
     cart = Cart(customer_id=customer_id, product_id=product_id)
     session.add(cart)
     session.commit()
 
 # Remove a product from the cart for a specific customer
-def remove_product_from_cart(session, customer_id, product_id):
+def remove_product_from_cart(customer_id, product_id):
     cart = session.query(Cart).filter(
         Cart.customer_id == customer_id,
         Cart.product_id == product_id
@@ -30,7 +30,7 @@ def remove_product_from_cart(session, customer_id, product_id):
         session.commit()
 
 # Calculate the total price of products in a customer's cart
-def calculate_cart_total(session, customer_id):
+def calculate_cart_total(customer_id):
     cart_items = session.query(Cart).filter(Cart.customer_id == customer_id).all()
     total_price = 0
 
