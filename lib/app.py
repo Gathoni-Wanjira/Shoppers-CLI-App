@@ -21,6 +21,8 @@ def find_product_by_name(product_name):
         click.echo(f"Found product: {product.product_name}, Price: ${product.price}")
     except NoResultFound:
         click.echo(f"Product {product_name} not found.")
+    # print ( product_name)
+    # print(session.query(Product).all())
 
 # Add a product to the cart for a specific customer
 @click.command()
