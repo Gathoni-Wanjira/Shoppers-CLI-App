@@ -1,14 +1,24 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Table
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine
 from sqlalchemy.orm import relationship
 
-
-
-engine = create_engine('sqlite:///shoppers.db')
-
-
 Base = declarative_base()
+
+# Define the association table for the many-to-many relationship between Customer and Product
+customer_product_association = Table(
+    'customer_product_association',
+    Base.metadata,
+    Column('customer_id', Integer, ForeignKey('customers.id')),
+    Column('product_id', Integer, ForeignKey('products.id'))
+)
+
+# Define the association table for the many-to-many relationship between Product and Cart
+product_cart_association = Table(
+    'product_cart_association',
+    Base.metadata,
+    Column('product_id', Integer, ForeignKey('products.id')),
+    Column('cart_id', Integer, ForeignKey('carts.id'))
+)
 
 class Customer(Base):
     __tablename__ = 'customers'
@@ -17,13 +27,11 @@ class Customer(Base):
     first_name = Column(String(), index=True)
     last_name = Column(String(), index=True)
 
-    # Establish a many-to-many relationship with Product through Cart
-    products = relationship('Product', secondary='carts', back_populates='customers')
+    # Define the many-to-many relationship with Product through the association table
+    products = relationship('Product', secondary=customer_product_association, back_populates='customers')
 
     def __repr__(self):
-        return f"Customer {self.id}: " \
-            + f"{self.first_name}, " \
-            + f"{self.last_name}, "
+        return f"Customer {self.id}: {self.first_name}, {self.last_name}"
 
 class Product(Base):
     __tablename__ = 'products'
@@ -33,23 +41,22 @@ class Product(Base):
     price = Column(Integer())
     product_serialNo = Column(Integer())
 
-    # Establish a many-to-many relationship with Customer through Cart
-    customers = relationship('Customer', secondary='carts', back_populates='products')
+    # Define the many-to-many relationship with Customer through the association table
+    customers = relationship('Customer', secondary=customer_product_association, back_populates='products')
+
+    # Define the many-to-many relationship with Cart through the association table
+    carts = relationship('Cart', secondary=product_cart_association, back_populates='products')
 
     def __repr__(self):
-        return f"Product {self.id}: " \
-            + f"{self.product_name}, " \
-            + f"{self.price}, " \
-            + f"{self.product_serialNo}, "
+        return f"Product {self.id}: {self.product_name}, {self.price}, {self.product_serialNo}"
 
 class Cart(Base):
     __tablename__ = 'carts'
 
     id = Column(Integer(), primary_key=True)
-    product_id = Column(Integer(), ForeignKey('products.id'))
-    customer_id = Column(Integer(), ForeignKey('customers.id'))
 
-    # Establish back references to Customer and Product
-    customer = relationship('Customer', back_populates='products', viewonly=True)
-    product = relationship('Product', back_populates='customers', viewonly=True)
-    
+    # Define the many-to-many relationship with Product through the association table
+    products = relationship('Product', secondary=product_cart_association, back_populates='carts')
+
+    def __repr__(self):
+        return f"Cart {self.id}"
