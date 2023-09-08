@@ -9,15 +9,6 @@ from model.models import Customer, Product, Cart
 def cli():
     pass
 
-cli.add_command(find_product_by_name)
-cli.add_command(add_product_to_cart)
-cli.add_command(remove_product_from_cart)
-cli.add_command(calculate_cart_total)
-
-if __name__ == "__main__":
-    cli()
-
-
 # Find a product by its name
 @click.command()
 @click.option('--product_name', prompt='Enter product name', help='Find a product by its name.')
@@ -79,4 +70,13 @@ def calculate_cart_total(customer_id):
         total_price += product.price
 
     click.echo(f"Total price of products in the cart for customer {customer_id}: ${total_price}")
+
+
+cli.add_command(find_product_by_name)
+cli.add_command(add_product_to_cart)
+cli.add_command(remove_product_from_cart)
+cli.add_command(calculate_cart_total)
+
+if __name__ == "__main__":
+    cli()
 
