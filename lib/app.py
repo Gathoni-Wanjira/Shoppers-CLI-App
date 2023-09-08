@@ -3,30 +3,27 @@ from database.db import session
 from sqlalchemy.orm.exc import NoResultFound
 from model.models import Customer, Product, Cart
 
-# Find a product by its name
-def find_product_by_name():
-    product_name = click.prompt("Enter product name")
-    try:
-        product = session.query(Product).filter(Product.product_name == product_name).one()
-        click.echo(f"Found product: {product.product_name}, Price: ${product.price}")
-    except NoResultFound:
-        click.echo(f"Product {product_name} not found.")
-
 # Add a product to the cart for a specific customer
-def add_product_to_cart():
-    customer_id = click.prompt("Enter customer ID", type=int)
-    product_id = click.prompt("Enter product ID", type=int)
-    
+@click.command()
+@click.option('--customer_id', prompt='Enter customer ID', type=int, help='Customer ID for adding a product.')
+@click.option('--product_id', prompt='Enter product ID', type=int, help='Product ID to add to the cart.')
+def add_product_to_cart(customer_id, product_id):
+    """
+    Add a product to the cart for a specific customer.
+    """
     cart = Cart(customer_id=customer_id, product_id=product_id)
     session.add(cart)
     session.commit()
     click.echo(f"Product {product_id} added to the cart for customer {customer_id}.")
 
 # Remove a product from the cart for a specific customer
-def remove_product_from_cart():
-    customer_id = click.prompt("Enter customer ID", type=int)
-    product_id = click.prompt("Enter product ID", type=int)
-    
+@click.command()
+@click.option('--customer_id', prompt='Enter customer ID', type=int, help='Customer ID for removing a product.')
+@click.option('--product_id', prompt='Enter product ID', type=int, help='Product ID to remove from the cart.')
+def remove_product_from_cart(customer_id, product_id):
+    """
+    Remove a product from the cart for a specific customer.
+    """
     cart = session.query(Cart).filter(
         Cart.customer_id == customer_id,
         Cart.product_id == product_id
@@ -40,9 +37,12 @@ def remove_product_from_cart():
         click.echo(f"Product {product_id} not found in the cart for customer {customer_id}.")
 
 # Calculate the total price of products in a customer's cart
-def calculate_cart_total():
-    customer_id = click.prompt("Enter customer ID", type=int)
-    
+@click.command()
+@click.option('--customer_id', prompt='Enter customer ID', type=int, help='Customer ID for calculating the total.')
+def calculate_cart_total(customer_id):
+    """
+    Calculate the total price of products in a customer's cart.
+    """
     cart_items = session.query(Cart).filter(Cart.customer_id == customer_id).all()
     total_price = 0
 
@@ -64,4 +64,3 @@ cli.add_command(calculate_cart_total)
 
 if __name__ == "__main__":
     cli()
-
