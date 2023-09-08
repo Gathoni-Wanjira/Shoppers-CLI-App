@@ -50,13 +50,11 @@ if __name__ == "__main__":
     carts = []
     for i in range(10):
         cart = Cart(
-            name=fake.unique.name(),
-            product_id=random.randint(1, 10),
-            customer_id=random.randint(1, 10),
-        )
+        product_id=random.randint(1, 10),
+        customer_id=random.randint(1, 10),
+    )
 
-        carts.append(cart)
+    carts.append(cart)
 
-    session.bulk_save_objects(carts)
-    session.commit()
-    session.close()
+session.bulk_save_objects(carts)
+session.commit()
